@@ -42,12 +42,14 @@ async def categories(call: CallbackQuery):
         await call.message.delete()
         await call.message.answer(text=texts.shopping_main, reply_markup=inl_kb.shopping_main())
 
+    elif value == '2':
+        await call.message.edit_text(text=texts.shopping_main, reply_markup=inl_kb.shopping_main())
+
 @router.callback_query(F.data.startswith('category:'))
-async def check_category(call: CallbackQuery):
+async def subcategories(call: CallbackQuery):
     name, value = call.data.split(sep=":")
     await call.answer()
-    if value == "1":
-        await call.message.edit_text(text=texts.choose_meal, reply_markup=inl_kb.category_1())
+    await call.message.edit_text(text=texts.shopping_main, reply_markup=inl_kb.subcategory_kb(value))
 
 async def main():
     logging.basicConfig(level=logging.INFO)
