@@ -34,8 +34,8 @@ async def start_btn(call: CallbackQuery):
         caption=texts.start,
         reply_markup=inl_kb.start_kb())
 
-@router.callback_query(F.data.startswith('shopping:'))
-async def buttons(call: CallbackQuery):
+@router.callback_query(F.data.startswith('start:'))
+async def categories(call: CallbackQuery):
     name, value = call.data.split(sep=':')
     await call.answer()
     if value == '1':
@@ -43,12 +43,11 @@ async def buttons(call: CallbackQuery):
         await call.message.answer(text=texts.shopping_main, reply_markup=inl_kb.shopping_main())
 
 @router.callback_query(F.data.startswith('category:'))
-async def categories(call: CallbackQuery):
+async def check_category(call: CallbackQuery):
     name, value = call.data.split(sep=":")
     await call.answer()
-    await call.message.delete()
     if value == "1":
-        await call.message.answer(text=texts.choose_meal, reply_markup=inl_kb.zamorozka())
+        await call.message.edit_text(text=texts.choose_meal, reply_markup=inl_kb.category_1())
 
 async def main():
     logging.basicConfig(level=logging.INFO)
