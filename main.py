@@ -6,13 +6,14 @@ from assets import texts
 from assets.keyboards import inline_keyboards as inl_kb
 from aiogram import Dispatcher, Bot, F, Router
 from aiogram.filters import Command
-from aiogram.types import (Message, CallbackQuery, ReplyKeyboardMarkup,
-                           KeyboardButton, ReplyKeyboardRemove, WebAppInfo, KeyboardButtonPollType, FSInputFile)
+from aiogram.types import (Message, CallbackQuery, FSInputFile)
 from dotenv import load_dotenv
 
 load_dotenv()
 token = os.getenv("BOT_TOKEN")
 router = Router()
+
+elements_on_page = 5
 
 @router.message(Command('start'))
 async def start(message: Message):
@@ -21,7 +22,7 @@ async def start(message: Message):
         caption=texts.start,
         reply_markup=inl_kb.start_kb())
 
-@router.message(F.text == "Высотин птср")
+@router.message(F.text == "Высотин петр")
 async def petr(message: Message):
     await message.answer("Пердун")
 
@@ -34,22 +35,22 @@ async def start_btn(call: CallbackQuery):
         caption=texts.start,
         reply_markup=inl_kb.start_kb())
 
-@router.callback_query(F.data.startswith('start:'))
+@router.callback_query(F.data.startswith('categories:'))
 async def categories(call: CallbackQuery):
-    name, value = call.data.split(sep=':')
+    name, value, page = call.data.split(sep=':')
     await call.answer()
     if value == '1':
         await call.message.delete()
-        await call.message.answer(text=texts.shopping_main, reply_markup=inl_kb.shopping_main())
+        await call.message.answer(text=texts.shopping_main, reply_markup=inl_kb.shopping_main(page=int(page), limit=elements_on_page))
 
     elif value == '2':
-        await call.message.edit_text(text=texts.shopping_main, reply_markup=inl_kb.shopping_main())
+        await call.message.edit_text(text=texts.shopping_main, reply_markup=inl_kb.shopping_main(page=int(page), limit=elements_on_page))
 
-@router.callback_query(F.data.startswith('category:'))
+@router.callback_query(F.data.startswith('subcategories:'))
 async def subcategories(call: CallbackQuery):
-    name, value = call.data.split(sep=":")
+    name, value, page = call.data.split(sep=":")
     await call.answer()
-    await call.message.edit_text(text=texts.shopping_main, reply_markup=inl_kb.subcategory_kb(value))
+    await call.message.edit_text(text=texts.shopping_main, reply_markup=inl_kb.subcategory_kb(int(value), int(page), elements_on_page))
 
 async def main():
     logging.basicConfig(level=logging.INFO)
