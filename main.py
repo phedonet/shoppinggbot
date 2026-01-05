@@ -52,6 +52,12 @@ async def subcategories(call: CallbackQuery):
     await call.answer()
     await call.message.edit_text(text=texts.shopping_main, reply_markup=inl_kb.subcategory_kb(int(value), int(page), elements_on_page))
 
+@router.callback_query(F.data.startswith('products:'))
+async def products(call: CallbackQuery):
+    name, value, page, id_sub = call.data.split(sep=":")
+    await call.answer()
+    await call.message.edit_text(text=texts.shopping_main, reply_markup=inl_kb.products_kb(int(value), int(page), elements_on_page, int(id_sub)))
+
 async def main():
     logging.basicConfig(level=logging.INFO)
     bot = Bot(token=token)
