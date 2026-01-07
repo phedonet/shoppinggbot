@@ -58,6 +58,12 @@ async def products(call: CallbackQuery):
     await call.answer()
     await call.message.edit_text(text=texts.shopping_main, reply_markup=await inl_kb.products_kb(int(value), int(page), elements_on_page, int(id_sub)))
 
+@router.callback_query(F.data.startswith('product:'))
+async def product(call: CallbackQuery):
+    name, value, id_sub, id_pr = call.data.split(sep=":")
+    await call.answer()
+    await call.message.edit_text(text="a", reply_markup= inl_kb.product_kb(int(id_pr), int(id_sub)))
+
 async def main():
     logging.basicConfig(level=logging.INFO)
     bot = Bot(token=token)

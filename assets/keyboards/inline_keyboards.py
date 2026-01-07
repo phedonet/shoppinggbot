@@ -55,11 +55,14 @@ async def products_kb(value: int, page: int, limit: int, subcategory_id: int) ->
     inl_kb = []
     i = 1 + limit * (page - 1)
     for product in products:
-        inl_kb.append([InlineKeyboardButton(text=product[0], callback_data=f'product:{i}')])
+        inl_kb.append([InlineKeyboardButton(text=product[0], callback_data=f'product:{i}:{subcategory_id}:{value}')])
         i += 1
-    inl_kb.append([InlineKeyboardButton(text="<", callback_data=f"products:{value}:{page - 1}"),
+    inl_kb.append([InlineKeyboardButton(text="<", callback_data=f"products:{subcategory_id}:{page - 1}:{value}"),
                    InlineKeyboardButton(text=f"{page}/{pages}", callback_data=" "),
-                   InlineKeyboardButton(text=">", callback_data=f"products:{value}:{page + 1}")])
+                   InlineKeyboardButton(text=">", callback_data=f"products:{subcategory_id}:{page + 1}:{value}")])
     inl_kb.append([InlineKeyboardButton(text="Назад", callback_data=f"subcategories:{subcategory_id}:1")])
 
     return InlineKeyboardMarkup(inline_keyboard=inl_kb)
+
+def product_kb(products_id: int , subcategory_id: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f"products:{products_id}:1:{subcategory_id}")]])

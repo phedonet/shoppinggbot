@@ -39,3 +39,8 @@ async def count_pages_products(id_subcategory: int, limit: int) -> int:
         res = await con.execute_fetchall('SELECT COUNT(*) FROM products WHERE id_subcategory = ?', (id_subcategory,))
 
     return res[0][0] // limit + 1 if res[0][0] % limit != 0 else res[0][0] // limit
+
+async def get_product(i: int, id_subcategory: int) -> tuple:
+    async with sql.connect('database.db') as con:
+        all_list = await con.execute_fetchall('SELECT * FROM products WHERE id_subcategory = ?', (id_subcategory,))
+    return all_list[i]
