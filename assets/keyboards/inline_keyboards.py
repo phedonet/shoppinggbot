@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from assets import base_op
+from assets import base_op as base
 
 def start_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -8,12 +8,12 @@ def start_kb():
         ]
     ])
 
-def shopping_main(page: int, limit: int) -> InlineKeyboardMarkup:
-    pages = base_op.count_pages_categories(limit)
+async def shopping_main(page: int, limit: int) -> InlineKeyboardMarkup:
+    pages = await base.count_pages_categories(limit)
     page %= pages + 1
     if page == 0:
         page = 1
-    categories = base_op.show_categories(page, limit)
+    categories = await base.show_categories(page, limit)
     inl_kb = [[InlineKeyboardButton(text="Поиск", callback_data="search:0")]]
     i = 1 + limit * (page - 1)
 
@@ -26,9 +26,9 @@ def shopping_main(page: int, limit: int) -> InlineKeyboardMarkup:
 
     return InlineKeyboardMarkup(inline_keyboard=inl_kb)
 
-def subcategory_kb(value: int, page: int, limit: int) -> InlineKeyboardMarkup:
-    pages = base_op.count_pages_subcategories(value, limit)
-    subcategories = base_op.show_subcategories(value, page, limit)
+async def subcategory_kb(value: int, page: int, limit: int) -> InlineKeyboardMarkup:
+    pages = await base.count_pages_subcategories(value, limit)
+    subcategories = await base.show_subcategories(value, page, limit)
     page %= pages + 1
     if page == 0:
         page = 1
@@ -46,9 +46,9 @@ def subcategory_kb(value: int, page: int, limit: int) -> InlineKeyboardMarkup:
 
     return InlineKeyboardMarkup(inline_keyboard=inl_kb)
 
-def products_kb(value: int, page: int, limit: int, subcategory_id: int) -> InlineKeyboardMarkup:
-    pages = base_op.count_pages_products(value, limit)
-    products = base_op.show_products(value, page, limit)
+async def products_kb(value: int, page: int, limit: int, subcategory_id: int) -> InlineKeyboardMarkup:
+    pages = await base.count_pages_products(value, limit)
+    products = await base.show_products(value, page, limit)
     page %= pages + 1
     if page == 0:
         page = 1
