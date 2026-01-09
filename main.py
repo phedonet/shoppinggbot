@@ -48,21 +48,21 @@ async def categories(call: CallbackQuery):
 
 @router.callback_query(F.data.startswith('subcategories:'))
 async def subcategories(call: CallbackQuery):
-    name, value, page = call.data.split(sep=":")
+    name, id_subcategory, page = call.data.split(sep=":")
     await call.answer()
-    await call.message.edit_text(text=texts.shopping_main, reply_markup=await inl_kb.subcategory_kb(int(value), int(page), elements_on_page))
+    await call.message.edit_text(text=texts.shopping_main, reply_markup=await inl_kb.subcategory_kb(int(id_subcategory), int(page), elements_on_page))
 
 @router.callback_query(F.data.startswith('products:'))
 async def products(call: CallbackQuery):
-    name, value, page, id_sub = call.data.split(sep=":")
+    name, id_products, page, id_subcategory = call.data.split(sep=":")
     await call.answer()
-    await call.message.edit_text(text=texts.shopping_main, reply_markup=await inl_kb.products_kb(int(value), int(page), elements_on_page, int(id_sub)))
+    await call.message.edit_text(text=texts.shopping_main, reply_markup=await inl_kb.products_kb(int(id_products), int(page), elements_on_page, int(id_subcategory)))
 
 @router.callback_query(F.data.startswith('product:'))
 async def product(call: CallbackQuery):
-    name, value, id_sub, id_pr = call.data.split(sep=":")
+    name, id_product, id_subcategory, id_products = call.data.split(sep=":")
     await call.answer()
-    await call.message.edit_text(text="a", reply_markup= inl_kb.product_kb(int(id_pr), int(id_sub)))
+    await call.message.edit_text(text="a", reply_markup= inl_kb.product_kb(int(id_products), int(id_subcategory)))
 
 async def main():
     logging.basicConfig(level=logging.INFO)
