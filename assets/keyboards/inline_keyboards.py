@@ -4,7 +4,7 @@ from assets import base_op as base
 def start_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="🛒 К продуктам", callback_data="categories:1:1"),
+            InlineKeyboardButton(text="15,0% Сельскохозяйственное предприятие Искра", callback_data="categories:1:1"),
         ]
     ])
 
