@@ -93,3 +93,37 @@ async def get_id_subcategory(id_product: int) -> int:
         )
 
     return res[0][0]
+
+async def get_id_photos(id_product: int) -> list:
+    async with sql.connect('assets/database.db') as con:
+        res = await con.execute_fetchall(
+            'SELECT id, tg_photo_id FROM photos '
+            'WHERE id_product = ?',
+            (id_product,)
+        )
+
+    return res
+
+async def add_id_photo(id_photo: int, id_telegram_photo: str) -> None:
+    async with sql.connect('assets/database.db') as con:
+        await con.execute(
+            'UPDATE photos SET tg_photo_id = ? '
+            'WHERE id = ?',
+            (id_telegram_photo, id_photo)
+        )
+        await con.commit()
+
+async def count_photos() -> int:
+    async with sql.connect('assets/database.db') as con:
+        res = await con.execute_fetchall('SELECT COUNT(*) FROM photos')
+
+    return res[0][0]
+
+async def get_id_product(id_photo: int) -> int:
+    async with sql.connect('assets/database.db') as con:
+        res = await con.execute_fetchall(
+            'SELECT id_product FROM photos '
+            'WHERE id = ?',
+            (id_photo,))
+
+    return res[0][0]

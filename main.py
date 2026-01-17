@@ -2,18 +2,35 @@ import asyncio
 import os
 import logging
 
+from aiogram.exceptions import TelegramBadRequest
+
 from assets import texts
 from assets.keyboards import inline_keyboards as inl_kb
 from aiogram import Dispatcher, Bot, F, Router
 from aiogram.filters import Command
 from aiogram.types import (Message, CallbackQuery, FSInputFile)
 from dotenv import load_dotenv
+from assets import base_op as base
+
 
 load_dotenv()
-token = os.getenv("BOT_TOKEN")
+TOKEN = os.getenv("BOT_TOKEN")
+DEFAULT_MEDIA_PATH = os.getenv("DEFAULT_MEDIA_PATH")
 router = Router()
+ADMIN_ID = os.getenv("ADMIN_ID")
+SERVICE_CHAT_ID = os.getenv("SERVICE_CHAT_ID")
 
 elements_on_page = 5
+
+@router.message(Command('warmup'))
+async def warmup(message: Message):
+    if message.from_user.id != int(ADMIN_ID):
+        await message.answer(text="Недостаточно прав для исполнения этой команды!")
+        return
+
+    for product_id in range(1, await base.count_photos() + 1):
+        msg = await message.bot.send_photo(photo=FSInputFile(f'{DEFAULT_MEDIA_PATH}/products/{product_id}.png'), chat_id=int(SERVICE_CHAT_ID))
+        await base.add_id_photo(product_id, msg.photo[-1].file_id)
 
 @router.message(Command('start'))
 async def start(message: Message):
@@ -83,15 +100,26 @@ async def product(call: CallbackQuery):
     await call.answer()
     await call.message.delete()
     text = await texts.product(int(id_product))
-    await call.message.answer_photo(
-        caption=text,
-        reply_markup=await inl_kb.product_kb(int(id_product)),
-        photo=FSInputFile(f'assets/media/products/{id_product}.png')
-    )
+    id_photo_tg = await base.get_id_photos(int(id_product))
+    if len(id_photo_tg) == 1:
+        try:
+            await call.message.answer_photo(
+                caption=text,
+                reply_markup=await inl_kb.product_kb(int(id_product)),
+                photo=str(id_photo_tg[0][1]))
+
+        except TelegramBadRequest:
+            msg = await call.message.answer_photo(
+                caption=text,
+                reply_markup=await inl_kb.product_kb(int(id_product)),
+                photo=FSInputFile(f'{DEFAULT_MEDIA_PATH}/products/{id_product}.png')
+            )
+            await base.add_id_photo(int(id_photo_tg[0][0]), msg.photo[-1].file_id)
+
 
 async def main():
     logging.basicConfig(level=logging.INFO)
-    bot = Bot(token=token)
+    bot = Bot(token=TOKEN)
     dp = Dispatcher()
     dp.include_router(router)
     await dp.start_polling(bot)
