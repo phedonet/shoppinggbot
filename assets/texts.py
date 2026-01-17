@@ -10,7 +10,7 @@ async def product(id_product: int) -> str:
     main_text = main_text.replace('\\n', '\n')
 
     res = (f"{product_info[3]} {product_info[2]}\n"
-           f"Рейтинг: {product_info[4]}\n{main_text}\n"
-           f"Дата проверки: {product_info[7]}\n"
-           f"Ссылка на Проднадзор: {product_info[6]}")
+           f"Рейтинг: {product_info[4]}\n\n{main_text}\n\n"
+           f"Дата проверки: {product_info[7]}"
+           )
     return res

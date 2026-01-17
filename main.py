@@ -65,7 +65,7 @@ async def subcategories(call: CallbackQuery):
 async def products(call: CallbackQuery):
     name, id_products, page, value = call.data.split(sep=":")
     await call.answer()
-    if value:
+    if int(value):
         await call.message.delete()
         await call.message.answer(
             text=texts.choose_meal,

@@ -47,9 +47,9 @@ async def subcategory_kb(id_category: int, page: int, limit: int) -> InlineKeybo
             callback_data=f'products:{subcategory[0]}:1:0')]
         )
 
-    inl_kb.append([InlineKeyboardButton(text="<", callback_data=f"subcategories:{id_category}:{page - 1}:0"),
+    inl_kb.append([InlineKeyboardButton(text="<", callback_data=f"subcategories:{id_category}:{page - 1}"),
                    InlineKeyboardButton(text=f"{page}/{pages}", callback_data=" "),
-                   InlineKeyboardButton(text=">", callback_data=f"subcategories:{id_category}:{page + 1}:0")])
+                   InlineKeyboardButton(text=">", callback_data=f"subcategories:{id_category}:{page + 1}")])
     inl_kb.append([InlineKeyboardButton(text="Назад", callback_data="categories:2:1")])
 
     return InlineKeyboardMarkup(inline_keyboard=inl_kb)
@@ -69,13 +69,16 @@ async def products_kb(id_subcategory: int, page: int, limit: int) -> InlineKeybo
             callback_data=f'product:{product[0]}')]
         )
 
-    inl_kb.append([InlineKeyboardButton(text="<", callback_data=f"products:{id_subcategory}:{page - 1}"),
+    inl_kb.append([InlineKeyboardButton(text="<", callback_data=f"products:{id_subcategory}:{page - 1}:0"),
                    InlineKeyboardButton(text=f"{page}/{pages}", callback_data=" "),
-                   InlineKeyboardButton(text=">", callback_data=f"products:{id_subcategory}:{page + 1}")])
+                   InlineKeyboardButton(text=">", callback_data=f"products:{id_subcategory}:{page + 1}:0")])
     inl_kb.append([InlineKeyboardButton(text="Назад", callback_data=f"subcategories:{id_category}:1")])
 
     return InlineKeyboardMarkup(inline_keyboard=inl_kb)
 
 async def product_kb(id_product: int) -> InlineKeyboardMarkup:
     id_subcategory = await base.get_id_subcategory(id_product)
-    return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f"products:{id_subcategory}:1:1")]])
+    product = await base.get_product(id_product)
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Ссылка на Проднадзор", url=product[6])],
+        [InlineKeyboardButton(text="Назад", callback_data=f"products:{id_subcategory}:1:1")]])
