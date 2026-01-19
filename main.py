@@ -29,15 +29,36 @@ async def warmup(message: Message):
         return
 
     for product_id in range(1, await base.count_photos() + 1):
-        msg = await message.bot.send_photo(photo=FSInputFile(f'{DEFAULT_MEDIA_PATH}/products/{product_id}.png'), chat_id=int(SERVICE_CHAT_ID))
+        msg = await message.bot.send_photo(
+            photo=FSInputFile(f'{DEFAULT_MEDIA_PATH}/products/{product_id}.png'),
+            chat_id=int(SERVICE_CHAT_ID)
+        )
         await base.add_id_photo(product_id, msg.photo[-1].file_id)
+
+    for service_id in range(1, await base.count_photos(service_table=True) + 1):
+        msg = await message.bot.send_photo(
+            photo=FSInputFile(f'{DEFAULT_MEDIA_PATH}/bot/{await base.get_name_service_photo(service_id)}'),
+            chat_id=int(SERVICE_CHAT_ID)
+        )
+        await base.add_id_photo(service_id, msg.photo[-1].file_id, add_to_service=True)
 
 @router.message(Command('start'))
 async def start(message: Message):
-    await message.answer_photo(
-        FSInputFile('assets/media/bot/menu.png'),
-        caption=texts.start,
-        reply_markup=inl_kb.start_kb())
+    id_photo = await base.get_id_photos(id_product="menu.png", from_service=True)
+    try:
+        await message.answer_photo(
+            photo=str(id_photo[0][1]),
+            caption=texts.start,
+            reply_markup=inl_kb.start_kb()
+        )
+
+    except TelegramBadRequest:
+        msg = await message.answer_photo(
+            photo=FSInputFile(f"{DEFAULT_MEDIA_PATH}/bot/menu.png"),
+            caption=texts.start,
+            reply_markup=inl_kb.start_kb()
+        )
+        await base.add_id_photo(id_photo=1, id_telegram_photo=msg.photo[-1].file_id, add_to_service=True)
 
 @router.message(F.text == "Высотин петр")
 async def petr(message: Message):
@@ -47,10 +68,21 @@ async def petr(message: Message):
 async def start_btn(call: CallbackQuery):
     await call.answer()
     await call.message.delete()
-    await call.message.answer_photo(
-        FSInputFile('assets/media/bot/menu.png'),
-        caption=texts.start,
-        reply_markup=inl_kb.start_kb())
+    id_photo = await base.get_id_photos(id_product="menu.png", from_service=True)
+    try:
+        await call.message.answer_photo(
+            photo=str(id_photo[0][1]),
+            caption=texts.start,
+            reply_markup=inl_kb.start_kb()
+        )
+
+    except TelegramBadRequest:
+        msg = await call.message.answer_photo(
+            photo=FSInputFile(f"{DEFAULT_MEDIA_PATH}/bot/menu.png"),
+            caption=texts.start,
+            reply_markup=inl_kb.start_kb()
+        )
+        await base.add_id_photo(id_photo=1, id_telegram_photo=msg.photo[-1].file_id, add_to_service=True)
 
 @router.callback_query(F.data.startswith('categories:'))
 async def categories(call: CallbackQuery):

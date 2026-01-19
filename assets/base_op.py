@@ -94,28 +94,48 @@ async def get_id_subcategory(id_product: int) -> int:
 
     return res[0][0]
 
-async def get_id_photos(id_product: int) -> list:
+async def get_id_photos(id_product: int | str, from_service=False) -> list:
     async with sql.connect('assets/database.db') as con:
-        res = await con.execute_fetchall(
-            'SELECT id, tg_photo_id FROM photos '
-            'WHERE id_product = ?',
-            (id_product,)
-        )
+        if from_service:
+            res = await con.execute_fetchall(
+                'SELECT id, tg_photo_id FROM service '
+                'WHERE name_in_bot_folder = ?',
+                (id_product,)
+            )
+
+        else:
+            res = await con.execute_fetchall(
+                'SELECT id, tg_photo_id FROM photos '
+                'WHERE id_product = ?',
+                (id_product,)
+            )
 
     return res
 
-async def add_id_photo(id_photo: int, id_telegram_photo: str) -> None:
+async def add_id_photo(id_photo: int, id_telegram_photo: str, add_to_service=False) -> None:
     async with sql.connect('assets/database.db') as con:
-        await con.execute(
-            'UPDATE photos SET tg_photo_id = ? '
-            'WHERE id = ?',
-            (id_telegram_photo, id_photo)
-        )
+        if add_to_service:
+            await con.execute(
+                'UPDATE service SET tg_photo_id = ? '
+                'WHERE id = ?',
+                (id_telegram_photo, id_photo)
+            )
+
+        else:
+            await con.execute(
+                'UPDATE photos SET tg_photo_id = ? '
+                'WHERE id = ?',
+                (id_telegram_photo, id_photo)
+            )
+
         await con.commit()
 
-async def count_photos() -> int:
+async def count_photos(service_table=False) -> int:
     async with sql.connect('assets/database.db') as con:
-        res = await con.execute_fetchall('SELECT COUNT(*) FROM photos')
+        if service_table:
+            res = await con.execute_fetchall('SELECT COUNT(*) FROM service')
+        else:
+            res = await con.execute_fetchall('SELECT COUNT(*) FROM photos')
 
     return res[0][0]
 
@@ -124,6 +144,17 @@ async def get_id_product(id_photo: int) -> int:
         res = await con.execute_fetchall(
             'SELECT id_product FROM photos '
             'WHERE id = ?',
-            (id_photo,))
+            (id_photo,)
+        )
+
+    return res[0][0]
+
+async def get_name_service_photo(id_photo: int) -> str:
+    async with sql.connect('assets/database.db') as con:
+        res = await con.execute_fetchall(
+            'SELECT name_in_bot_folder FROM service '
+            'WHERE id = ?',
+            (id_photo,)
+        )
 
     return res[0][0]
