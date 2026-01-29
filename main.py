@@ -3,7 +3,6 @@ import os
 import logging
 
 from aiogram.exceptions import TelegramBadRequest
-
 from assets import texts
 from assets.keyboards import inline_keyboards as inl_kb
 from aiogram import Dispatcher, Bot, F, Router
@@ -11,7 +10,11 @@ from aiogram.filters import Command
 from aiogram.types import (Message, CallbackQuery, FSInputFile)
 from dotenv import load_dotenv
 from assets import base_op as base
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.context import FSMContext
 
+class Search(StatesGroup):
+    search = State()
 
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
@@ -44,7 +47,7 @@ async def warmup(message: Message):
 
 @router.message(Command('start'))
 async def start(message: Message):
-    id_photo = await base.get_id_photos(id_product="menu.png", from_service=True)
+    id_photo = await base.get_id_photos(id_product="menu.jpg", from_service=True)
     try:
         await message.answer_photo(
             photo=str(id_photo[0][1]),
@@ -54,7 +57,7 @@ async def start(message: Message):
 
     except TelegramBadRequest:
         msg = await message.answer_photo(
-            photo=FSInputFile(f"{DEFAULT_MEDIA_PATH}/bot/menu.png"),
+            photo=FSInputFile(f"{DEFAULT_MEDIA_PATH}/bot/menu.jpg"),
             caption=texts.start,
             reply_markup=inl_kb.start_kb()
         )
@@ -68,7 +71,7 @@ async def petr(message: Message):
 async def start_btn(call: CallbackQuery):
     await call.answer()
     await call.message.delete()
-    id_photo = await base.get_id_photos(id_product="menu.png", from_service=True)
+    id_photo = await base.get_id_photos(id_product="menu.jpg", from_service=True)
     try:
         await call.message.answer_photo(
             photo=str(id_photo[0][1]),
@@ -78,14 +81,15 @@ async def start_btn(call: CallbackQuery):
 
     except TelegramBadRequest:
         msg = await call.message.answer_photo(
-            photo=FSInputFile(f"{DEFAULT_MEDIA_PATH}/bot/menu.png"),
+            photo=FSInputFile(f"{DEFAULT_MEDIA_PATH}/bot/menu.jpg"),
             caption=texts.start,
             reply_markup=inl_kb.start_kb()
         )
         await base.add_id_photo(id_photo=1, id_telegram_photo=msg.photo[-1].file_id, add_to_service=True)
 
 @router.callback_query(F.data.startswith('categories:'))
-async def categories(call: CallbackQuery):
+async def categories(call: CallbackQuery, state: FSMContext):
+    await state.clear()
     name, value, page = call.data.split(sep=':')
     await call.answer()
     if value == '1':
@@ -147,6 +151,18 @@ async def product(call: CallbackQuery):
                 photo=FSInputFile(f'{DEFAULT_MEDIA_PATH}/products/{id_product}.png')
             )
             await base.add_id_photo(int(id_photo_tg[0][0]), msg.photo[-1].file_id)
+
+@router.callback_query(F.data == 'search:0')
+async def search_screen(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    await state.set_state(Search.search)
+    await call.message.edit_text(text=texts.search_text, reply_markup=inl_kb.search_kb())
+
+@router.message(Search.search)
+async def search(message: Message, state: FSMContext):
+    brand = message.text.strip()
+    await state.clear()
+    await message.answer(text=texts.result_search, reply_markup=await inl_kb.searched_kb(brand))
 
 
 async def main():

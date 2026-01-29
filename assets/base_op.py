@@ -158,3 +158,15 @@ async def get_name_service_photo(id_photo: int) -> str:
         )
 
     return res[0][0]
+
+async def search_brand(brand: str) -> list:
+    async with sql.connect('assets/database.db') as con:
+        res = await con.execute_fetchall(
+            'SELECT products.id, products.name, products.brand '
+            'FROM products_fts as f '
+            'JOIN products ON products.id = f.ROWID '
+            'WHERE f.brand MATCH ?;',
+            (brand,)
+        )
+
+    return res
