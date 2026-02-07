@@ -8,14 +8,14 @@ result_search = "Результаты поиска по отправленном
 
 async def product(id_product: int) -> str:
     product_info = await base.get_product(id_product)
-    main_text = product_info[5]
+    main_text = product_info[4]
     main_text = main_text.replace('\\n', '\n')
 
-    res = (f"{product_info[3]} {product_info[2]}\n"
-           f"Результат: {"Имеются нарушения ⚠️" if product_info[4] < 100 else "Нарушений не выявлено ✅"}\n"
+    res = (f"{product_info[2]}\n"
+           f"Результат: {"Имеются нарушения ⚠️" if product_info[3] < 100 else "Нарушений не выявлено ✅"}\n"
            f"\n"
            f"{main_text}\n"
            f"\n"
-           f"🗓 Дата проверки: {product_info[7]}"
+           f"🗓 Дата проверки: {product_info[6]}"
            )
     return res

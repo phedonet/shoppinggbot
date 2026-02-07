@@ -5,7 +5,7 @@ async def show_categories(page: int, limit: int) -> list:
         start_l = (page - 1) * limit
         res = await con.execute_fetchall(
             'SELECT id, name FROM categories '
-            'ORDER BY id '
+            'ORDER BY name '
             'LIMIT ?, ?',
             (start_l, limit)
         )
@@ -24,7 +24,7 @@ async def show_subcategories(id_category: int, page: int, limit: int) -> list:
         res = await con.execute_fetchall(
             'SELECT id, name FROM subcategories '
             'WHERE id_category = ? '
-            'ORDER BY id '
+            'ORDER BY name '
             'LIMIT ?, ?',
             (id_category, start_l, limit)
         )
@@ -43,13 +43,12 @@ async def count_pages_subcategories(id_category: int, limit: int) -> int:
 
 async def show_products(id_subcategory: int, page: int, limit: int) -> list:
     start_l = (page - 1) * limit
-    end_l = page * limit
     async with sql.connect('assets/database.db') as con:
         res = await con.execute_fetchall(
-            'SELECT id, name, brand FROM products '
+            'SELECT id, name FROM products '
             'WHERE id_subcategory = ? '
             'ORDER BY id LIMIT ?, ?',
-            (id_subcategory, start_l, end_l)
+            (id_subcategory, start_l, limit)
         )
 
     return res
@@ -159,14 +158,35 @@ async def get_name_service_photo(id_photo: int) -> str:
 
     return res[0][0]
 
-async def search_brand(brand: str) -> list:
+async def search_brand(text: str) -> list:
+    req = 'SELECT id, name FROM products WHERE for_search LIKE ?'
+    add_and = ' AND for_search LIKE ?'
+    add_or = ' OR for_search LIKE ?'
+    text = text.lower()
+    text = text.replace('%', '')
+    text = text.replace('-', ' ')
+    text = text.strip()
+    prev_space = False
+    new_text = ''
+    for i in range(len(text)):
+        if prev_space and text[i] == ' ':
+            continue
+        elif text[i] == ' ':
+            prev_space = True
+            new_text += text[i]
+        else:
+            prev_space = False
+            new_text += text[i]
+
+    new_text = new_text.split()
+    for i in range(len(new_text)):
+        new_text[i] = f'%{new_text[i]}%'
+    req += add_and * (len(new_text) - 1)
+
     async with sql.connect('assets/database.db') as con:
         res = await con.execute_fetchall(
-            'SELECT products.id, products.name, products.brand '
-            'FROM products_fts as f '
-            'JOIN products ON products.id = f.ROWID '
-            'WHERE f.brand MATCH ?;',
-            (brand,)
+            req,
+            new_text
         )
 
     return res

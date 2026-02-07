@@ -65,7 +65,7 @@ async def products_kb(id_subcategory: int, page: int, limit: int) -> InlineKeybo
     inl_kb = [[InlineKeyboardButton(text="Поиск по производителю  🔎", callback_data="search:0")]]
     for product in products:
         inl_kb.append([InlineKeyboardButton(
-            text=f'{product[1]} "{product[2]}"',
+            text=f'{product[1]}',
             callback_data=f'product:{product[0]}')]
         )
 
@@ -80,7 +80,7 @@ async def product_kb(id_product: int) -> InlineKeyboardMarkup:
     id_subcategory = await base.get_id_subcategory(id_product)
     product = await base.get_product(id_product)
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🌐 Ссылка на Проднадзор", url=product[6])],
+        [InlineKeyboardButton(text="🌐 Ссылка на Проднадзор", url=product[5])],
         [InlineKeyboardButton(text="Назад ↩", callback_data=f"products:{id_subcategory}:1:1")],
         [InlineKeyboardButton(text='К категориям ↩', callback_data='categories:1:1')]
     ])
@@ -95,7 +95,7 @@ async def searched_kb(brand: str) -> InlineKeyboardMarkup:
     inl_kb = []
     for product in products:
         inl_kb.append([InlineKeyboardButton(
-            text=f'{product[1]} "{product[2]}"',
+            text=f'{product[1]}',
             callback_data=f'product:{product[0]}')
         ])
 
