@@ -10,6 +10,7 @@ from aiogram.filters import Command
 from aiogram.types import (Message, CallbackQuery, FSInputFile)
 from dotenv import load_dotenv
 from assets import base_op as base
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
@@ -166,8 +167,9 @@ async def search(message: Message, state: FSMContext):
 
 
 async def main():
+    session = AiohttpSession(timeout=180)
     logging.basicConfig(level=logging.INFO)
-    bot = Bot(token=TOKEN)
+    bot = Bot(token=TOKEN, session=session)
     dp = Dispatcher()
     dp.include_router(router)
     await dp.start_polling(bot)
