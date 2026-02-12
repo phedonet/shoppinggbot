@@ -17,7 +17,7 @@ async def shopping_main(page: int, limit: int) -> InlineKeyboardMarkup:
         page = 1
 
     categories = await base.show_categories(page, limit)
-    inl_kb = [[InlineKeyboardButton(text="Поиск по производителю  🔎", callback_data="search:0")]]
+    inl_kb = [[InlineKeyboardButton(text="Поиск  🔎", callback_data="search:0")]]
 
     for category in categories:
         inl_kb.append([InlineKeyboardButton(
@@ -39,7 +39,7 @@ async def subcategory_kb(id_category: int, page: int, limit: int) -> InlineKeybo
     if page == 0:
         page = 1
 
-    inl_kb = [[InlineKeyboardButton(text="Поиск по производителю  🔎", callback_data="search:0")]]
+    inl_kb = [[InlineKeyboardButton(text="Поиск  🔎", callback_data="search:0")]]
     subcategories = await base.show_subcategories(id_category, page, limit)
     for subcategory in subcategories:
         inl_kb.append([InlineKeyboardButton(
@@ -62,7 +62,7 @@ async def products_kb(id_subcategory: int, page: int, limit: int) -> InlineKeybo
 
     products = await base.show_products(id_subcategory, page, limit)
     id_category = await base.get_id_category(id_subcategory)
-    inl_kb = [[InlineKeyboardButton(text="Поиск по производителю  🔎", callback_data="search:0")]]
+    inl_kb = [[InlineKeyboardButton(text="Поиск  🔎", callback_data="search:0")]]
     for product in products:
         inl_kb.append([InlineKeyboardButton(
             text=f'{product[1]}',

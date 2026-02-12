@@ -4,7 +4,7 @@ start = "Привет! 👋\nМы рады приветствовать тебя
 shopping_main = "Выберите категорию товаров или воспользуйтесь поиском:"
 choose_meal = "Выберите нужный продукт из списка или воспользуйтесь поиском:"
 search_text = "Напишите название производителя или торговой марки для поиска:"
-result_search = "Результаты поиска по отправленному производителю:"
+result_search = "Результаты поиска:"
 
 async def product(id_product: int) -> str:
     product_info = await base.get_product(id_product)
