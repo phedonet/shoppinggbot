@@ -38,6 +38,7 @@ async def warmup(message: Message):
             chat_id=int(SERVICE_CHAT_ID)
         )
         await base.add_id_photo(product_id, msg.photo[-1].file_id)
+        await asyncio.sleep(2)
 
     for service_id in range(1, await base.count_photos(service_table=True) + 1):
         msg = await message.bot.send_photo(
@@ -45,6 +46,7 @@ async def warmup(message: Message):
             chat_id=int(SERVICE_CHAT_ID)
         )
         await base.add_id_photo(service_id, msg.photo[-1].file_id, add_to_service=True)
+        await asyncio.sleep(2)
 
 @router.message(Command('start'))
 async def start(message: Message):

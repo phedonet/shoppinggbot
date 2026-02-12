@@ -10,9 +10,9 @@ async def product(id_product: int) -> str:
     product_info = await base.get_product(id_product)
     main_text = product_info[4]
     main_text = main_text.replace('\\n', '\n')
-
+    status = "Имеются нарушения ⚠️" if product_info[3] < 100 else "Нарушений не выявлено ✅"
     res = (f"{product_info[2]}\n"
-           f"Результат: {"Имеются нарушения ⚠️" if product_info[3] < 100 else "Нарушений не выявлено ✅"}\n"
+           f"Результат: {status}\n"
            f"\n"
            f"{main_text}\n"
            f"\n"
