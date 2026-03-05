@@ -144,13 +144,13 @@ async def product(call: CallbackQuery):
         try:
             await call.message.answer_photo(
                 caption=text,
-                reply_markup=await inl_kb.product_kb(int(id_product)),
+                reply_markup=await inl_kb.product_kb(int(id_product), elements_on_page),
                 photo=str(id_photo_tg[0][1]))
 
         except TelegramBadRequest:
             msg = await call.message.answer_photo(
                 caption=text,
-                reply_markup=await inl_kb.product_kb(int(id_product)),
+                reply_markup=await inl_kb.product_kb(int(id_product), elements_on_page),
                 photo=FSInputFile(f'{DEFAULT_MEDIA_PATH}/products/{id_product}.png')
             )
             await base.add_id_photo(int(id_photo_tg[0][0]), msg.photo[-1].file_id)
