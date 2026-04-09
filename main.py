@@ -66,10 +66,6 @@ async def start(message: Message):
         )
         await base.add_id_photo(id_photo=1, id_telegram_photo=msg.photo[-1].file_id, add_to_service=True)
 
-@router.message(F.text == "Высотин петр")
-async def petr(message: Message):
-    await message.answer("Пердун")
-
 @router.callback_query(F.data == 'main_menu:0')
 async def start_btn(call: CallbackQuery):
     await call.answer()
